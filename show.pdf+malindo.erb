@@ -1,0 +1,299 @@
+<% item_index = 0 %>
+<% customer = @loan_case.customer %>
+<% vehicle = @loan_case.vehicle %>
+<% customer_address = customer.residential_address %>
+<% home_loan = @loan_case.home_loan %>
+
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <table
+      cellspacing="2"
+      align="center"
+      style="width: 90%; font-size: 14px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif">
+      <tr>
+        <td colspan="2" style="height: 30px"></td>
+      </tr>
+      <tr>
+        <td> <img src="https://rvjtech.s3.ap-south-1.amazonaws.com/malindo-logo.jpg"/, width= '180'></td>
+        <td style="text-align: right">
+          <table cellspacing="0" cellpadding="0" style="width: 100%">
+            <tr>
+              <td><strong><%= @company.name %></strong></td>
+            </tr>
+            <tr>
+              <td><%= @company.full_address %>,</td>
+            </tr>
+            <tr>
+              <td><%= @company.contact_numbers %>,</td>
+            </tr>
+            <tr>
+              <td>CIN Number : <%= @company.cin_number %></td>
+            </tr>
+            <tr>
+              <td>E-mail : <%= @company.email %></td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <strong>
+            <% if [1,2,3].include?(@loan_case.created_at.strftime("%m").to_i) %>
+              Ref.No.MFPL/<%= @loan_case.created_at.strftime("%B") %>/<%= @loan_case.created_at.strftime("%Y").to_i - 1 %>-<%= @loan_case.created_at.strftime("%Y") %>
+            <% else %>
+              Ref.No.MFPL/<%= @loan_case.created_at.strftime("%B") %>/<%= @loan_case.created_at.strftime("%Y") %>-<%= @loan_case.created_at.strftime("%Y").to_i + 1 %>
+            <% end %>
+          </strong>
+        </td>
+        <td align="right">
+          <strong>Date-<%= @loan_case.created_at.strftime("%B %m, %Y") %></strong>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2" style="height: 4px"></td>
+      </tr>
+      <tr>
+        <td colspan="2" align="center" style="font-size: 18px; text-align: center">
+          Sanction Letter
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2" style="height: 4px"></td>
+      </tr>
+      <tr>
+        <td colspan="2">Dear Sir/Madam,</td>
+      </tr>
+      <tr>
+        <td colspan="2" style="height: 4px"></td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          We thank you for choosing <%= @company.name %>  for your financial need. We are glad to inform you
+          that your loan application dated <%= @loan_case.created_at.strftime('%B %d, %Y') %> for sanction of a  <span><%= @loan_case.home_loan ? "Loan Against Property" : case_type(@loan_case) %></span> Scheme has been considered favorably by the Competent Authority and you have been sanctioned Loan Against Property of <span><%= formatted_amount(@loan_case.finance_amount).to_i %></span> (<span><%= to_lakh_crores(@loan_case.finance_amount) %> Rupay</span>) On the following terms and conditions mentioned below:-
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2" style="height: 4px"></td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <table cellspacing="0" cellpadding="5" style="width: 100%" border="1">
+            <tr>
+              <td>Sr.No.</td>
+              <td>Subject</td>
+              <td>Particulars</td>
+            </tr>
+            <tr>
+              <td><%= item_index += 1 %></td>
+              <td>Borrower</td>
+              <td><%= customer.full_name_with_care_of %></td>
+            </tr>
+            <tr>
+              <td><%= item_index += 1 %></td>
+              <td>Co-Applicants</td>
+              <td><%= @loan_case.coapplicants.each_with_index.map{|coapplicant,index| "#{index + 1} #{coapplicant.full_name}" }.join(",")  %></td>
+            </tr>
+            <tr>
+              <td><%= item_index += 1 %></td>
+              <td>Guarantors</td>
+              <td><%= @loan_case.guarantors.each_with_index.map{|guarantor,index| "#{index + 1} #{guarantor.full_name}" }.join(",")  %></td>
+            </tr>
+            <tr>
+              <td><%= item_index += 1 %></td>
+              <td>Address of Applicant</td>
+              <td><%= customer_address.address_line1.titleize %>,
+                <%= customer_address.address_line2.titleize %>,
+                <%= customer_address.pincode %>,
+                <%= customer_address.city.titleize %>
+              </td>
+            </tr>
+            <tr>
+              <td><%= item_index += 1 %></td>
+              <td>Loan Amount Sanctioned</td>
+              <td>Rs.<%= formatted_amount(@loan_case.finance_amount).to_i %></td>
+            </tr>
+            <tr>
+              <td><%= item_index += 1 %></td>
+              <td>Category</td>
+              <td><%= @loan_case.home_loan ? "LAP" : case_type(@loan_case) %></td>
+            </tr>
+            <tr>
+              <td><%= item_index += 1 %></td>
+              <td>Interest type (Variable /Floating/Flat)</td>
+              <td><%= @loan_case.rateplan.interest_type.capitalize %></td>
+            </tr>
+            <tr>
+              <td><%= item_index += 1 %></td>
+              <td>Repayments of Loan (Tenure in months)</td>
+              <td><%= @loan_case.tenure %> Months</td>
+            </tr>
+            <tr>
+              <td><%= item_index += 1 %></td>
+              <td>Collection Frequency</td>
+              <td><%= @loan_case.rateplan.emi_collection_string %></td>
+            </tr>
+            <tr>
+              <td><%= item_index += 1 %></td>
+              <td>Repayment Mode</td>
+              <td><%= @loan_case.repayment_mode || "Cash" %></td>
+            </tr>
+            <tr>
+              <td><%= item_index += 1 %></td>
+              <td>Amount of Each EMI(INR)</td>
+              <td><%= @loan_case.installment %>/-</td>
+            </tr>
+            <tr>
+              <td><%= item_index += 1 %></td>
+              <td>Advance EMI</td>
+              <td><%= @loan_case.rateplan.advance_emi %></td>
+            </tr>
+            <tr>
+              <td><%= item_index += 1 %></td>
+              <td>Advance EMI Amt.(Rs.)</td>
+              <td><%= @loan_case.advance_emi_amount %></td>
+            </tr>
+            <tr>
+              <td><%= item_index += 1 %></td>
+              <td>Rate of Interest(Flat/Reducing)</td>
+              <td><%= @loan_case.rate_of_interest %> % (<%= @loan_case.rateplan.interest_type&.capitalize %>)</td>
+            </tr>
+            <% if @loan_case.is_home_loan_case? && property = @loan_case.home_loan.property.presence %>
+              <% if property.address.present? %>
+                <tr>
+                  <td><%= item_index += 1 %></td>
+                  <td>Security (Offered  for loan & address) </td>
+                  <td>
+                    <%= property.address.address_line1.titleize %>,
+                    <%= property.address.address_line2.titleize %>,
+                    <%= property.address.address_line3.titleize%>,
+                    <%= property.address.city_state_with_country.titleize%>,
+                    <%= property.address.pincode.titleize %>
+                  </td>
+                </tr>
+              <% end %>
+              <% if property.market_value.present? %>
+                <tr>
+                  <td><%= item_index += 1 %></td>
+                  <td>Market value </td>
+                  <td><%= property.market_value %></td>
+                </tr>
+              <% end %>
+              <% if property.residual_value.present? %>
+                <tr>
+                  <td><%= item_index += 1 %></td>
+                  <td>Residual value </td>
+                  <td><%= property.residual_value %></td>
+                </tr>
+              <% end %>
+              <% if property.disbursement_value.present? %>
+                <tr>
+                  <td><%= item_index += 1 %></td>
+                  <td>Disbursement value </td>
+                  <td><%= property.market_value %></td>
+                </tr>
+              <% end %>
+            <% end %>
+            <% if @loan_case.is_vehicle_loan_case? %>
+              <tr>
+                <td><%= item_index += 1 %></td>
+                <td>Vehicle Category </td>
+                <td><%= vehicle.vehicle_sub_category %></td>
+              </tr>
+              <tr>
+                <td><%= item_index += 1 %></td>
+                <td>Dealer/Supplier</td>
+                <td><%= "#{@loan_case.dealer_name}, #{@loan_case.dealer.try(:address).try(:city)}" %></td>
+              </tr>
+              <tr>
+                <td><%= item_index += 1 %></td>
+                <td>Purpose </td>
+                <td><%= vehicle.vehicle_category %></td>
+              </tr>
+              <tr>
+                <td><%= item_index += 1 %></td>
+                <td>New/Old </td>
+                <td> <%= vehicle.article_type %></td>
+              </tr>
+               <tr>
+                <td><%= item_index += 1 %></td>
+                <td>Make & Model </td>
+                <td> <%= "#{vehicle.vehicle_make.name}, #{vehicle.vehicle_model.name.capitalize unless vehicle.vehicle_model.blank?}" %></td>
+              </tr> <tr>
+                <td><%= item_index += 1 %></td>
+                <td>Year </td>
+                <td> <%= vehicle.year_of_make %></td>
+              </tr>
+            <% end %>
+            <% @loan_case.rateplan_charges_applied.each do |rc| %>
+              <tr>
+              <td><%= item_index += 1 %></td>
+              <td><%= rc[:charge_label] %></td>
+              <td><%= rupee(rc[:charge_amount]) %></td></tr>
+            <% end %>
+            <tr>
+              <td><%= item_index += 1 %></td>
+              <td>Total Upfront Charge</td>
+              <td><%= @loan_case.upfront_charges %></td>
+            </tr>
+            <tr>
+              <td><%= item_index += 1 %></td>
+              <td>GST on Upfront Charges </td>
+              <td><%= ((@loan_case.upfront_charges) * 0.18).truncate() %></td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+
+      <tr>
+        <td colspan="2">
+          <div>Additional conditions to comply prior to loan disbursal</div>
+          <div>(1) Repayment on before 5th day of every month.</div>
+          <div>(2) Legal Vetting and search report to be conducted at party’s cost.</div>
+          <div>(3) NOC from tenant at offered collateral security.</div>
+          <div>(4) Confirmation of all KYC documents.</div>
+          <div>(5) This sanction is integral part of the process note.</div>
+          <div>(6) CGST, SGST, Central Duty, State Duty and Other Service Charges are levied extra as per
+              applicable rate/rules/norms.</div>
+          <br>
+          <div>Please return the duplicate copy of this sanction letter duly signed as a token of acceptance of
+              terms and conditions of this sanction of loan</div>
+          <p> Thanks and regards </p>
+          <p> For <%= @company.name %> </p>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2" style="height: 20px"></td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <table style="width: 100%">
+            <tr>
+              <td>
+                1.<span><hr /></span>
+                (Primary Customer)
+              </td>
+              <td style="width: 60px"></td>
+              <td>
+                2.<span><hr /></span>
+                (Co-applicant)
+              </td>
+              <td style="width: 60px"></td>
+              <td>
+                3.<span><hr /></span>
+                (Co-applicant)
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
